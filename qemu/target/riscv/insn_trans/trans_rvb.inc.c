@@ -50,6 +50,12 @@ static bool trans_ctz(DisasContext *ctx, arg_ctz *a)
     return gen_unary_per_ol(ctx, a, gen_ctz, gen_ctzw);
 }
 
+static bool trans_cpop(DisasContext *ctx, arg_cpop *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, tcg_gen_ctpop_tl);
+}
+
 static bool trans_minu(DisasContext *ctx, arg_minu *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
