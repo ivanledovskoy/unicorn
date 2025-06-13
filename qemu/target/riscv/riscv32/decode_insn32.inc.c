@@ -360,6 +360,8 @@ static bool trans_fcvt_d_wu(DisasContext *ctx, arg_fcvt_d_wu *a);
 
 typedef arg_r2 arg_clz;
 static bool trans_clz(DisasContext *ctx, arg_clz *a);
+typedef arg_r2 arg_ctz;
+static bool trans_ctz(DisasContext *ctx, arg_ctz *a);
 typedef arg_r arg_minu;
 static bool trans_minu(DisasContext *ctx, arg_minu *a);
 
@@ -611,6 +613,11 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                     /* 01100000 0000.... .001.... .0010011 */
                     /* qemu-10.0.2/target/riscv/insn32.decode:785 */
                     if (trans_clz(ctx, &u.f_r2)) return true;
+                    return false;
+                case 0x1:
+                    /* 01100000 0001.... .001.... .0010011 */
+                    /* qemu-10.0.2/target/riscv/insn32.decode:787 */
+                    if (trans_ctz(ctx, &u.f_r2)) return true;
                     return false;
                 }
                 return false;

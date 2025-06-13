@@ -35,6 +35,21 @@ static bool trans_clz(DisasContext *ctx, arg_clz *a)
     return gen_unary_per_ol(ctx, a, gen_clz, gen_clzw);
 }
 
+static void gen_ctz(TCGContext *tcg_ctx, TCGv ret, TCGv arg1)
+{
+    tcg_gen_ctzi_tl(tcg_ctx, ret, arg1, TARGET_LONG_BITS);
+}
+
+static void gen_ctzw(TCGContext *tcg_ctx, TCGv ret, TCGv arg1)
+{
+    tcg_gen_ctzi_tl(tcg_ctx, ret, arg1, 32);
+}
+
+static bool trans_ctz(DisasContext *ctx, arg_ctz *a)
+{
+    return gen_unary_per_ol(ctx, a, gen_ctz, gen_ctzw);
+}
+
 static bool trans_minu(DisasContext *ctx, arg_minu *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
