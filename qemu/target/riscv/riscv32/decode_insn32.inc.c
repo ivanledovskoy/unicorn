@@ -84,6 +84,11 @@ typedef struct {
 } arg_r;
 
 typedef struct {
+    int rd;
+    int rs1;
+} arg_r2;
+
+typedef struct {
     int imm;
     int rs1;
     int rs2;
@@ -353,6 +358,8 @@ static bool trans_fcvt_d_w(DisasContext *ctx, arg_fcvt_d_w *a);
 typedef arg_decode_insn3212 arg_fcvt_d_wu;
 static bool trans_fcvt_d_wu(DisasContext *ctx, arg_fcvt_d_wu *a);
 
+typedef arg_r2 arg_clz;
+static bool trans_clz(DisasContext *ctx, arg_clz *a);
 typedef arg_r arg_minu;
 static bool trans_minu(DisasContext *ctx, arg_minu *a);
 
@@ -508,6 +515,7 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
         arg_i f_i;
         arg_j f_j;
         arg_r f_r;
+        arg_r2 f_r2;
         arg_s f_s;
         arg_shift f_shift;
         arg_u f_u;
@@ -589,15 +597,24 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             return false;
         case 0x1:
             /* ........ ........ .001.... .0010011 */
-            decode_insn32_extract_sh(ctx, &u.f_shift, insn);
-            switch ((insn >> 30) & 0x3) {
+            switch ((insn >> 27) & 0x1f) {
             case 0x0:
-                /* 00...... ........ .001.... .0010011 */
-                /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:110 */
+                /* 00000... ........ .001.... .0010011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:156 */
                 if (trans_slli(ctx, &u.f_shift)) return true;
                 return false;
+            case 0xc:
+                /* 01100... ........ .001.... .0010011 */
+                decode_insn32_extract_r2(ctx, &u.f_r2, insn);
+                switch ((insn >> 20) & 0x7f) {
+                case 0x0:
+                    /* 01100000 0000.... .001.... .0010011 */
+                    /* qemu-10.0.2/target/riscv/insn32.decode:785 */
+                    if (trans_clz(ctx, &u.f_r2)) return true;
+                    return false;
+                }
+                return false;
             }
-            return false;
         case 0x2:
             /* ........ ........ .010.... .0010011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:105 */

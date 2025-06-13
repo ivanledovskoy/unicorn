@@ -18,6 +18,23 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+static void gen_clz(TCGContext *tcg_ctx, TCGv ret, TCGv arg1)
+{
+    tcg_gen_clzi_tl(tcg_ctx, ret, arg1, TARGET_LONG_BITS);
+}
+
+static void gen_clzw(TCGContext *tcg_ctx, TCGv ret, TCGv arg1)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+    tcg_gen_shli_tl(tcg_ctx, t, arg1, 32);
+    tcg_gen_clzi_tl(tcg_ctx, ret, t, 32);
+}
+
+static bool trans_clz(DisasContext *ctx, arg_clz *a)
+{
+    return gen_unary_per_ol(ctx, a, gen_clz, gen_clzw);
+}
+
 static bool trans_minu(DisasContext *ctx, arg_minu *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
