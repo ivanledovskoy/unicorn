@@ -1091,6 +1091,7 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             return false;
         case 0x0a005000:
             /* ..00101. ........ .101.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
             switch ((insn >> 30) & 0x3) {
             case 0x0:
                 /* 0000101. ........ .101.... .0110011 */

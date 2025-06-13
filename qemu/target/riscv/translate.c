@@ -714,6 +714,7 @@ static bool gen_arith(TCGContext *tcg_ctx, arg_r *a,
     gen_get_gpr(tcg_ctx, source2, a->rs2);
 
     (*func)(tcg_ctx, source1, source1, source2);
+    printf("a->rd = %d\n", a->rd);
     gen_set_gpr(tcg_ctx, a->rd, source1);
     tcg_temp_free(tcg_ctx, source1);
     tcg_temp_free(tcg_ctx, source2);
