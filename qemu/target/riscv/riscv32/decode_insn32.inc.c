@@ -353,6 +353,9 @@ static bool trans_fcvt_d_w(DisasContext *ctx, arg_fcvt_d_w *a);
 typedef arg_decode_insn3212 arg_fcvt_d_wu;
 static bool trans_fcvt_d_wu(DisasContext *ctx, arg_fcvt_d_wu *a);
 
+typedef arg_r arg_minu;
+static bool trans_minu(DisasContext *ctx, arg_minu *a);
+
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
     a->aq = extract32(insn, 26, 1);
@@ -855,6 +858,16 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             /* 0100000. ........ .101.... .0110011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:120 */
             if (trans_sra(ctx, &u.f_r)) return true;
+            return false;
+        case 0x0a005000:
+            /* ..00101. ........ .101.... .0110011 */
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0000101. ........ .101.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:791 */
+                if (trans_minu(ctx, &u.f_r)) return true;
+                return false;
+            }
             return false;
         }
         return false;

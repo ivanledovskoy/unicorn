@@ -17,3 +17,9 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+static bool trans_minu(DisasContext *ctx, arg_minu *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, tcg_gen_umin_tl);
+}
