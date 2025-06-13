@@ -605,6 +605,28 @@ static int ex_rvc_shifti(DisasContext *ctx, int imm)
 #include "riscv64/decode_insn32.inc.c"
 #endif
 
+static bool gen_logic(DisasContext *ctx, arg_r *a,
+                      void (*func)(TCGContext *, TCGv, TCGv, TCGv))
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    
+    TCGv src1, src2;
+    src1 = tcg_temp_new(tcg_ctx);
+    src2 = tcg_temp_new(tcg_ctx);
+
+    gen_get_gpr(tcg_ctx, src1, a->rs1);
+    gen_get_gpr(tcg_ctx, src2, a->rs2);
+
+    (*func)(tcg_ctx, src1, src1, src2);
+
+    gen_set_gpr(tcg_ctx, a->rd, src1);
+
+    tcg_temp_free(tcg_ctx, src1);
+    tcg_temp_free(tcg_ctx, src2);
+
+    return true;
+}
+
 static bool gen_arith_imm_fn(DisasContext *ctx, arg_i *a,
                              void (*func)(TCGContext *, TCGv, TCGv, target_long))
 {

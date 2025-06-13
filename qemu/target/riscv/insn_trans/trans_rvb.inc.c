@@ -56,6 +56,11 @@ static bool trans_cpop(DisasContext *ctx, arg_cpop *a)
     return gen_unary(tcg_ctx, a, tcg_gen_ctpop_tl);
 }
 
+static bool trans_andn(DisasContext *ctx, arg_andn *a)
+{
+    return gen_logic(ctx, a, tcg_gen_andc_tl);
+}
+
 static bool trans_minu(DisasContext *ctx, arg_minu *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;

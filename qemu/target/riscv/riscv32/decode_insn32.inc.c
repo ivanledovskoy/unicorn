@@ -364,6 +364,8 @@ typedef arg_r2 arg_ctz;
 static bool trans_ctz(DisasContext *ctx, arg_ctz *a);
 typedef arg_r2 arg_cpop;
 static bool trans_cpop(DisasContext *ctx, arg_cpop *a);
+typedef arg_r arg_andn;
+static bool trans_andn(DisasContext *ctx, arg_andn *a);
 typedef arg_r arg_minu;
 static bool trans_minu(DisasContext *ctx, arg_minu *a);
 
@@ -799,7 +801,7 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
     case 0x00000033:
         /* ........ ........ ........ .0110011 */
         decode_insn32_extract_r(ctx, &u.f_r, insn);
-        switch (insn & 0xfe007000) {
+        switch (insn & 0x3e007000) {
         case 0x00000000:
             /* 0000000. ........ .000.... .0110011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:113 */
@@ -836,9 +838,20 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             if (trans_or(ctx, &u.f_r)) return true;
             return false;
         case 0x00007000:
-            /* 0000000. ........ .111.... .0110011 */
-            /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:122 */
-            if (trans_and(ctx, &u.f_r)) return true;
+            /* ..00000. ........ .111.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0000000. ........ .111.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:168 */
+                if (trans_and(ctx, &u.f_r)) return true;
+                return false;
+            case 0x1:
+                /* 0100000. ........ .111.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:770 */
+                if (trans_andn(ctx, &u.f_r)) return true;
+                return false;
+            }
             return false;
         case 0x02000000:
             /* 0000001. ........ .000.... .0110011 */
