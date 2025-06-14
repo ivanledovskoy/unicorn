@@ -466,6 +466,10 @@ typedef arg_r arg_bclr;
 static bool trans_bclr(DisasContext *ctx, arg_bclr *a);
 typedef arg_shift arg_bclri;
 static bool trans_bclri(DisasContext *ctx, arg_bclri *a);
+typedef arg_r arg_binv;
+static bool trans_binv(DisasContext *ctx, arg_binv *a);
+typedef arg_shift arg_binvi;
+static bool trans_binvi(DisasContext *ctx, arg_binvi *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -766,6 +770,12 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                     if (trans_sext_h(ctx, &u.f_r2)) return true;
                     return false;
                 }
+                return false;
+            case 0xd:
+                /* 01101... ........ .001.... .0010011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:838 */
+                decode_insn32_extract_sh(ctx, &u.f_shift, insn);
+                if (trans_binvi(ctx, &u.f_shift)) return true;
                 return false;
             }
             return false;
@@ -1235,6 +1245,11 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 /* 0010100. ........ .001.... .0110011 */
                 /* qemu-10.0.2/target/riscv/insn32.decode:839 */
                 if (trans_bset(ctx, &u.f_r)) return true;
+                return false;
+            case 0x1:
+                /* 0110100. ........ .001.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:837 */
+                if (trans_binv(ctx, &u.f_r)) return true;
                 return false;
             }
             return false;

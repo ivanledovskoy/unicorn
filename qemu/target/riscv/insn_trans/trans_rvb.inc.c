@@ -148,3 +148,21 @@ static bool trans_bclri(DisasContext *ctx, arg_bclri *a)
 {
     return gen_shift_imm_tl(ctx, a, gen_bclr);
 }
+
+static void gen_binv(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv shamt)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+
+    gen_sbop_mask(tcg_ctx, t, shamt);
+    tcg_gen_xor_tl(tcg_ctx, ret, arg1, t);
+}
+
+static bool trans_binv(DisasContext *ctx, arg_binv *a)
+{
+    return gen_shift(ctx, a, gen_binv);
+}
+
+static bool trans_binvi(DisasContext *ctx, arg_binvi *a)
+{
+    return gen_shift_imm_tl(ctx, a, gen_binv);
+}
