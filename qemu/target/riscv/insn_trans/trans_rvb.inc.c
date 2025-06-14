@@ -233,3 +233,27 @@ static bool trans_rev8_32(DisasContext *ctx, arg_rev8_32 *a)
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_unary(tcg_ctx, a, gen_rev8_32);
 }
+
+#define GEN_SHADD(SHAMT)                                       \
+static void gen_sh##SHAMT##add(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv arg2) \
+{                                                              \
+    TCGv t = tcg_temp_new(tcg_ctx);                                   \
+                                                               \
+    tcg_gen_shli_tl(tcg_ctx, t, arg1, SHAMT);                           \
+    tcg_gen_add_tl(tcg_ctx, ret, t, arg2);                              \
+}   
+
+GEN_SHADD(1)
+GEN_SHADD(2)
+GEN_SHADD(3)
+
+#define GEN_TRANS_SHADD(SHAMT)                                             \
+static bool trans_sh##SHAMT##add(DisasContext *ctx, arg_sh##SHAMT##add *a) \
+{                                                                          \
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;                                \
+    return gen_arith(tcg_ctx, a, gen_sh##SHAMT##add);          \
+}
+
+GEN_TRANS_SHADD(1)
+GEN_TRANS_SHADD(2)
+GEN_TRANS_SHADD(3)

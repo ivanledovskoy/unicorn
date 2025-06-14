@@ -480,6 +480,12 @@ typedef arg_r arg_rol;
 static bool trans_rol(DisasContext *ctx, arg_rol *a);
 typedef arg_r2 arg_rev8_32;
 static bool trans_rev8_32(DisasContext *ctx, arg_rev8_32 *a);
+typedef arg_r arg_sh1add;
+static bool trans_sh1add(DisasContext *ctx, arg_sh1add *a);
+typedef arg_r arg_sh2add;
+static bool trans_sh2add(DisasContext *ctx, arg_sh2add *a);
+typedef arg_r arg_sh3add;
+static bool trans_sh3add(DisasContext *ctx, arg_sh3add *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -1211,6 +1217,28 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 return false;
             }
             return false;
+        case 0x20002000:
+            /* ..10000. ........ .010.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0010000. ........ .010.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:758 */
+                if (trans_sh1add(ctx, &u.f_r)) return true;
+                return false;
+            }
+            return false;
+        case 0x20004000:
+            /* ..10000. ........ .100.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0010000. ........ .100.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:759 */
+                if (trans_sh2add(ctx, &u.f_r)) return true;
+                return false;
+            }
+            return false;
         case 0x20005000:
             /* ..10000. ........ .101.... .0110011 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
@@ -1219,6 +1247,17 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 /* 0110000. ........ .101.... .0110011 */
                 /* qemu-10.0.2/target/riscv/insn32.decode:772 */
                 if (trans_ror(ctx, &u.f_r)) return true;
+                return false;
+            }
+            return false;
+        case 0x20006000:
+            /* ..10000. ........ .110.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0010000. ........ .110.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:760 */
+                if (trans_sh3add(ctx, &u.f_r)) return true;
                 return false;
             }
             return false;
