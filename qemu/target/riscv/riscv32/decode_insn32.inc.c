@@ -370,6 +370,8 @@ typedef arg_r arg_orn;
 static bool trans_orn(DisasContext *ctx, arg_orn *a);
 typedef arg_r arg_xnor;
 static bool trans_xnor(DisasContext *ctx, arg_xnor *a);
+typedef arg_r arg_min;
+static bool trans_min(DisasContext *ctx, arg_min *a);
 typedef arg_r arg_minu;
 static bool trans_minu(DisasContext *ctx, arg_minu *a);
 
@@ -928,6 +930,17 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             /* 0100000. ........ .101.... .0110011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:120 */
             if (trans_sra(ctx, &u.f_r)) return true;
+            return false;
+        case 0x0a004000:
+            /* ..00101. ........ .100.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0000101. ........ .100.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:790 */
+                if (trans_min(ctx, &u.f_r)) return true;
+                return false;
+            }
             return false;
         case 0x0a005000:
             /* ..00101. ........ .101.... .0110011 */
