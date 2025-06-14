@@ -506,6 +506,12 @@ typedef arg_r arg_rorw;
 static bool trans_rorw(DisasContext *ctx, arg_rorw *a);
 typedef arg_r arg_rolw;
 static bool trans_rolw(DisasContext *ctx, arg_rolw *a);
+typedef arg_r arg_sh1add_uw;
+static bool trans_sh1add_uw(DisasContext *ctx, arg_sh1add_uw *a);
+typedef arg_r arg_sh2add_uw;
+static bool trans_sh2add_uw(DisasContext *ctx, arg_sh2add_uw *a);
+typedef arg_r arg_sh3add_uw;
+static bool trans_sh3add_uw(DisasContext *ctx, arg_sh3add_uw *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -1490,6 +1496,24 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             /* qemu-10.0.2/target/riscv/insn32.decode:815 */
             decode_insn32_extract_r(ctx, &u.f_r, insn);
             if (trans_packw(ctx, &u.f_r)) return true;
+            return false;
+        case 0x20002000:
+            /* 0010000. ........ .010.... .0111011 */
+            /* qemu-10.0.2/target/riscv/insn32.decode:764 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            if (trans_sh1add_uw(ctx, &u.f_r)) return true;
+            return false;
+        case 0x20004000:
+            /* 0010000. ........ .100.... .0111011 */
+            /* qemu-10.0.2/target/riscv/insn32.decode:765 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            if (trans_sh2add_uw(ctx, &u.f_r)) return true;
+            return false;
+        case 0x20006000:
+            /* 0010000. ........ .110.... .0111011 */
+            /* qemu-10.0.2/target/riscv/insn32.decode:766 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            if (trans_sh3add_uw(ctx, &u.f_r)) return true;
             return false;
         case 0x40000000:
             /* 0100000. ........ .000.... .0111011 */

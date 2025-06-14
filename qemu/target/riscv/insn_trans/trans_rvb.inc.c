@@ -339,3 +339,30 @@ static bool trans_rolw(DisasContext *ctx, arg_rolw *a)
 {
     return gen_shift(ctx, a, gen_rolw);
 }
+
+#define GEN_SHADD_UW(SHAMT)                                       \
+static void gen_sh##SHAMT##add_uw(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv arg2) \
+{                                                                 \
+    TCGv t = tcg_temp_new(tcg_ctx);                               \
+                                                                  \
+    tcg_gen_ext32u_tl(tcg_ctx, t, arg1);                          \
+                                                                  \
+    tcg_gen_shli_tl(tcg_ctx, t, t, SHAMT);                        \
+    tcg_gen_add_tl(tcg_ctx, ret, t, arg2);                        \
+}
+
+GEN_SHADD_UW(1)
+GEN_SHADD_UW(2)
+GEN_SHADD_UW(3)
+
+#define GEN_TRANS_SHADD_UW(SHAMT)                             \
+static bool trans_sh##SHAMT##add_uw(DisasContext *ctx,        \
+                                    arg_sh##SHAMT##add_uw *a) \
+{                                                             \
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;                   \
+    return gen_arith(tcg_ctx, a, gen_sh##SHAMT##add_uw);      \
+}
+
+GEN_TRANS_SHADD_UW(1)
+GEN_TRANS_SHADD_UW(2)
+GEN_TRANS_SHADD_UW(3)
