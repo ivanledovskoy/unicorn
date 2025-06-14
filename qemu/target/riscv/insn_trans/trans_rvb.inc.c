@@ -310,3 +310,22 @@ static bool trans_packw(DisasContext *ctx, arg_packw *a)
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_arith(tcg_ctx, a, gen_packw);
 }
+
+static bool trans_clzw(DisasContext *ctx, arg_clzw *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, gen_clzw);
+}
+
+static bool trans_ctzw(DisasContext *ctx, arg_ctzw *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, gen_ctzw);
+    
+}
+
+static bool trans_cpopw(DisasContext *ctx, arg_cpopw *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, tcg_gen_ctpop_tl);
+}

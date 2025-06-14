@@ -420,6 +420,12 @@ typedef arg_r arg_packh;
 static bool trans_packh(DisasContext *ctx, arg_packh *a);
 typedef arg_r arg_packw;
 static bool trans_packw(DisasContext *ctx, arg_packw *a);
+typedef arg_r2 arg_clzw;
+static bool trans_clzw(DisasContext *ctx, arg_clzw *a);
+typedef arg_r2 arg_ctzw;
+static bool trans_ctzw(DisasContext *ctx, arg_ctzw *a);
+typedef arg_r2 arg_cpopw;
+static bool trans_cpopw(DisasContext *ctx, arg_cpopw *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
