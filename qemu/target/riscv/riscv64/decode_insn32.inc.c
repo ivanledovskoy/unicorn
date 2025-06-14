@@ -512,6 +512,8 @@ typedef arg_r arg_sh2add_uw;
 static bool trans_sh2add_uw(DisasContext *ctx, arg_sh2add_uw *a);
 typedef arg_r arg_sh3add_uw;
 static bool trans_sh3add_uw(DisasContext *ctx, arg_sh3add_uw *a);
+typedef arg_r arg_add_uw;
+static bool trans_add_uw(DisasContext *ctx, arg_add_uw *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -1484,6 +1486,12 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             /* 0000001. ........ .111.... .0111011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32-64.decode:45 */
             if (trans_remuw(ctx, &u.f_r)) return true;
+            return false;
+        case 0x08000000:
+            /* 0000100. ........ .000.... .0111011 */
+            /* qemu-10.0.2/target/riscv/insn32.decode:763 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            if (trans_add_uw(ctx, &u.f_r)) return true;
             return false;
         case 0x08004000:
             /* 0000100. ........ .100.... .0111011 */

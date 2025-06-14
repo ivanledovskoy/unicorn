@@ -436,6 +436,8 @@ typedef arg_r arg_sh2add_uw;
 static bool trans_sh2add_uw(DisasContext *ctx, arg_sh2add_uw *a);
 typedef arg_r arg_sh3add_uw;
 static bool trans_sh3add_uw(DisasContext *ctx, arg_sh3add_uw *a);
+typedef arg_r arg_add_uw;
+static bool trans_add_uw(DisasContext *ctx, arg_add_uw *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {

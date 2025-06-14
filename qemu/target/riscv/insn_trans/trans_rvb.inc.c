@@ -366,3 +366,16 @@ static bool trans_sh##SHAMT##add_uw(DisasContext *ctx,        \
 GEN_TRANS_SHADD_UW(1)
 GEN_TRANS_SHADD_UW(2)
 GEN_TRANS_SHADD_UW(3)
+
+static void gen_add_uw(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv arg2)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+    tcg_gen_ext32u_tl(tcg_ctx, t, arg1);
+    tcg_gen_add_tl(tcg_ctx, ret, t, arg2);
+}
+
+static bool trans_add_uw(DisasContext *ctx, arg_add_uw *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, gen_add_uw);
+}
