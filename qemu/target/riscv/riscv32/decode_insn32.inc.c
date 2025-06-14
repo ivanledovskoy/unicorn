@@ -370,6 +370,10 @@ typedef arg_r arg_orn;
 static bool trans_orn(DisasContext *ctx, arg_orn *a);
 typedef arg_r arg_xnor;
 static bool trans_xnor(DisasContext *ctx, arg_xnor *a);
+typedef arg_r arg_max;
+static bool trans_max(DisasContext *ctx, arg_max *a);
+typedef arg_r arg_maxu;
+static bool trans_maxu(DisasContext *ctx, arg_maxu *a);
 typedef arg_r arg_min;
 static bool trans_min(DisasContext *ctx, arg_min *a);
 typedef arg_r arg_minu;
@@ -950,6 +954,28 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 /* 0000101. ........ .101.... .0110011 */
                 /* qemu-10.0.2/target/riscv/insn32.decode:791 */
                 if (trans_minu(ctx, &u.f_r)) return true;
+                return false;
+            }
+            return false;
+        case 0x0a006000:
+            /* ..00101. ........ .110.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0000101. ........ .110.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:788 */
+                if (trans_max(ctx, &u.f_r)) return true;
+                return false;
+            }
+            return false;
+        case 0x0a007000:
+            /* ..00101. ........ .111.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x0:
+                /* 0000101. ........ .111.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:789 */
+                if (trans_maxu(ctx, &u.f_r)) return true;
                 return false;
             }
             return false;

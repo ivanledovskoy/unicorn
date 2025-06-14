@@ -77,8 +77,20 @@ static bool trans_min(DisasContext *ctx, arg_min *a)
     return gen_arith(tcg_ctx, a, tcg_gen_smin_tl);
 }
 
+static bool trans_max(DisasContext *ctx, arg_max *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, tcg_gen_smax_tl);
+}
+
 static bool trans_minu(DisasContext *ctx, arg_minu *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_arith(tcg_ctx, a, tcg_gen_umin_tl);
+}
+
+static bool trans_maxu(DisasContext *ctx, arg_maxu *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, tcg_gen_umax_tl);
 }
