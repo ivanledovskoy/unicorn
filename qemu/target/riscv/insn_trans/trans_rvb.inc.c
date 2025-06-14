@@ -257,3 +257,56 @@ static bool trans_sh##SHAMT##add(DisasContext *ctx, arg_sh##SHAMT##add *a) \
 GEN_TRANS_SHADD(1)
 GEN_TRANS_SHADD(2)
 GEN_TRANS_SHADD(3)
+
+static bool trans_zext_h_32(DisasContext *ctx, arg_zext_h_32 *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, tcg_gen_ext16u_tl);
+}
+
+static bool trans_zext_h_64(DisasContext *ctx, arg_zext_h_64 *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, tcg_gen_ext16u_tl);
+}
+
+static void gen_pack(TCGContext *tcg_ctx, TCGv ret, TCGv src1, TCGv src2)
+{
+    tcg_gen_deposit_tl(tcg_ctx, ret, src1, src2,
+                       TARGET_LONG_BITS / 2,
+                       TARGET_LONG_BITS / 2);
+}
+
+static void gen_packh(TCGContext *tcg_ctx, TCGv ret, TCGv src1, TCGv src2)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+
+    tcg_gen_ext8u_tl(tcg_ctx, t, src2);
+    tcg_gen_deposit_tl(tcg_ctx, ret, src1, t, 8, TARGET_LONG_BITS - 8);
+}
+
+static void gen_packw(TCGContext *tcg_ctx, TCGv ret, TCGv src1, TCGv src2)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+
+    tcg_gen_ext16s_tl(tcg_ctx, t, src2);
+    tcg_gen_deposit_tl(tcg_ctx, ret, src1, t, 16, TARGET_LONG_BITS - 16);
+}
+
+static bool trans_pack(DisasContext *ctx, arg_pack *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, gen_pack);
+}
+
+static bool trans_packh(DisasContext *ctx, arg_packh *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, gen_packh);
+}
+
+static bool trans_packw(DisasContext *ctx, arg_packw *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_arith(tcg_ctx, a, gen_packw);
+}
