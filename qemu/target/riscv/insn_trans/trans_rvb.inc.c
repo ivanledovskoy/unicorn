@@ -166,3 +166,19 @@ static bool trans_binvi(DisasContext *ctx, arg_binvi *a)
 {
     return gen_shift_imm_tl(ctx, a, gen_binv);
 }
+
+static void gen_bext(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv shamt)
+{
+    tcg_gen_shr_tl(tcg_ctx, ret, arg1, shamt);
+    tcg_gen_andi_tl(tcg_ctx, ret, ret, 1);
+}
+
+static bool trans_bext(DisasContext *ctx, arg_bext *a)
+{
+    return gen_shift(ctx, a, gen_bext);
+}
+
+static bool trans_bexti(DisasContext *ctx, arg_bexti *a)
+{
+    return gen_shift_imm_tl(ctx, a, gen_bext);
+}
