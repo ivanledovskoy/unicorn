@@ -130,3 +130,21 @@ static bool trans_bseti(DisasContext *ctx, arg_bseti *a)
 {
     return gen_shift_imm_tl(ctx, a, gen_bset);
 }
+
+static void gen_bclr(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv shamt)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+
+    gen_sbop_mask(tcg_ctx, t, shamt);
+    tcg_gen_andc_tl(tcg_ctx, ret, arg1, t);
+}
+
+static bool trans_bclr(DisasContext *ctx, arg_bclr *a)
+{
+    return gen_shift(ctx, a, gen_bclr);
+}
+
+static bool trans_bclri(DisasContext *ctx, arg_bclri *a)
+{
+    return gen_shift_imm_tl(ctx, a, gen_bclr);
+}

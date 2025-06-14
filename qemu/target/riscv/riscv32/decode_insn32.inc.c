@@ -386,6 +386,10 @@ typedef arg_r arg_bset;
 static bool trans_bset(DisasContext *ctx, arg_bset *a);
 typedef arg_shift arg_bseti;
 static bool trans_bseti(DisasContext *ctx, arg_bseti *a);
+typedef arg_r arg_bclr;
+static bool trans_bclr(DisasContext *ctx, arg_bclr *a);
+typedef arg_shift arg_bclri;
+static bool trans_bclri(DisasContext *ctx, arg_bclri *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -633,6 +637,12 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 /* qemu-10.0.2/target/riscv/insn32.decode:840 */
                 decode_insn32_extract_sh(ctx, &u.f_shift, insn);
                 if (trans_bseti(ctx, &u.f_shift)) return true;
+                return false;
+            case 0x9:
+                /* 01001... ........ .001.... .0010011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:834 */
+                decode_insn32_extract_sh(ctx, &u.f_shift, insn);
+                if (trans_bclri(ctx, &u.f_shift)) return true;
                 return false;
             case 0xc:
                 /* 01100... ........ .001.... .0010011 */
@@ -955,6 +965,17 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             /* 0100000. ........ .101.... .0110011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:120 */
             if (trans_sra(ctx, &u.f_r)) return true;
+            return false;
+        case 0x08001000:
+            /* ..00100. ........ .001.... .0110011 */
+            decode_insn32_extract_r(ctx, &u.f_r, insn);
+            switch ((insn >> 30) & 0x3) {
+            case 0x1:
+                /* 0100100. ........ .001.... .0110011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:833 */
+                if (trans_bclr(ctx, &u.f_r)) return true;
+                return false;
+            }
             return false;
         case 0x0a004000:
             /* ..00101. ........ .100.... .0110011 */
