@@ -222,3 +222,14 @@ static bool trans_rol(DisasContext *ctx, arg_rol *a)
 {
     return gen_shift_per_ol(ctx, a, tcg_gen_rotl_tl, gen_rolw);
 }
+
+static void gen_rev8_32(TCGContext *tcg_ctx, TCGv ret, TCGv src1)
+{
+    tcg_gen_bswap32_tl(tcg_ctx, ret, src1);
+}
+
+static bool trans_rev8_32(DisasContext *ctx, arg_rev8_32 *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, gen_rev8_32);
+}
