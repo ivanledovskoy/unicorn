@@ -426,6 +426,10 @@ typedef arg_r2 arg_ctzw;
 static bool trans_ctzw(DisasContext *ctx, arg_ctzw *a);
 typedef arg_r2 arg_cpopw;
 static bool trans_cpopw(DisasContext *ctx, arg_cpopw *a);
+typedef arg_r arg_rorw;
+static bool trans_rorw(DisasContext *ctx, arg_rorw *a);
+typedef arg_r arg_rolw;
+static bool trans_rolw(DisasContext *ctx, arg_rolw *a); 
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {

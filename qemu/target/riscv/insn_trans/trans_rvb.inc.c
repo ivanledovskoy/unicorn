@@ -321,11 +321,21 @@ static bool trans_ctzw(DisasContext *ctx, arg_ctzw *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_unary(tcg_ctx, a, gen_ctzw);
-    
+
 }
 
 static bool trans_cpopw(DisasContext *ctx, arg_cpopw *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_unary(tcg_ctx, a, tcg_gen_ctpop_tl);
+}
+
+static bool trans_rorw(DisasContext *ctx, arg_rorw *a)
+{
+    return gen_shift(ctx, a, gen_rorw);
+}
+
+static bool trans_rolw(DisasContext *ctx, arg_rolw *a)
+{
+    return gen_shift(ctx, a, gen_rolw);
 }
