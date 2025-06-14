@@ -66,6 +66,11 @@ static bool trans_orn(DisasContext *ctx, arg_orn *a)
     return gen_logic(ctx, a, tcg_gen_orc_tl);
 }
 
+static bool trans_xnor(DisasContext *ctx, arg_xnor *a)
+{
+    return gen_logic(ctx, a, tcg_gen_eqv_tl);
+}
+
 static bool trans_minu(DisasContext *ctx, arg_minu *a)
 {
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
