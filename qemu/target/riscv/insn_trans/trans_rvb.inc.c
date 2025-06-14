@@ -106,3 +106,22 @@ static bool trans_sext_h(DisasContext *ctx, arg_sext_h *a)
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_unary(tcg_ctx, a, tcg_gen_ext16s_tl);
 }
+
+static void gen_sbop_mask(TCGContext *tcg_ctx, TCGv ret, TCGv shamt)
+{
+    tcg_gen_movi_tl(tcg_ctx, ret, 1);
+    tcg_gen_shl_tl(tcg_ctx, ret, ret, shamt);
+}
+
+static void gen_bset(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv shamt)
+{
+    TCGv t = tcg_temp_new(tcg_ctx);
+
+    gen_sbop_mask(tcg_ctx, t, shamt);
+    tcg_gen_or_tl(tcg_ctx, ret, arg1, t);
+}
+
+static bool trans_bset(DisasContext *ctx, arg_bset *a)
+{
+    return gen_shift(ctx, a, gen_bset);
+}
