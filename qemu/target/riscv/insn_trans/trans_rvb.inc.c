@@ -94,3 +94,15 @@ static bool trans_maxu(DisasContext *ctx, arg_maxu *a)
     TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
     return gen_arith(tcg_ctx, a, tcg_gen_umax_tl);
 }
+
+static bool trans_sext_b(DisasContext *ctx, arg_sext_b *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, tcg_gen_ext8s_tl);
+}
+
+static bool trans_sext_h(DisasContext *ctx, arg_sext_h *a)
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, tcg_gen_ext16s_tl);
+}

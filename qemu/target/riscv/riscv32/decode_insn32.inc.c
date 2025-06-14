@@ -378,6 +378,10 @@ typedef arg_r arg_min;
 static bool trans_min(DisasContext *ctx, arg_min *a);
 typedef arg_r arg_minu;
 static bool trans_minu(DisasContext *ctx, arg_minu *a);
+typedef arg_r2 arg_sext_b;
+static bool trans_sext_b(DisasContext *ctx, arg_sext_b *a);
+typedef arg_r2 arg_sext_h;
+static bool trans_sext_h(DisasContext *ctx, arg_sext_h *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -637,6 +641,16 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                     /* 01100000 0010.... .001.... .0010011 */
                     /* qemu-10.0.2/target/riscv/insn32.decode:786 */
                     if (trans_cpop(ctx, &u.f_r2)) return true;
+                    return false;
+                case 0x4:
+                    /* 01100000 0100.... .001.... .0010011 */
+                    /* qemu-10.0.2/target/riscv/insn32.decode:794 */
+                    if (trans_sext_b(ctx, &u.f_r2)) return true;
+                    return false;
+                case 0x5:
+                    /* 01100000 0101.... .001.... .0010011 */
+                    /* qemu-10.0.2/target/riscv/insn32.decode:795 */
+                    if (trans_sext_h(ctx, &u.f_r2)) return true;
                     return false;
                 }
                 return false;
