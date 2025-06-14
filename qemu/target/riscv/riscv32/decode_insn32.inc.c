@@ -621,6 +621,7 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
             case 0x0:
                 /* 00000... ........ .001.... .0010011 */
                 /* qemu-10.0.2/target/riscv/insn32.decode:156 */
+                decode_insn32_extract_sh(ctx, &u.f_shift, insn);
                 if (trans_slli(ctx, &u.f_shift)) return true;
                 return false;
             case 0xc:
