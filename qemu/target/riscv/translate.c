@@ -742,6 +742,23 @@ static bool gen_arith(TCGContext *tcg_ctx, arg_r *a,
     return true;
 }
 
+static bool gen_shift_imm_tl(DisasContext *ctx, arg_shift *a,
+                        void(*func)(TCGContext *, TCGv, TCGv, TCGv))
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    TCGv src1, src2;
+    src1 = tcg_temp_new(tcg_ctx);
+
+    gen_get_gpr(tcg_ctx, src1, a->rs1);
+    src2 = tcg_const_tl(tcg_ctx, a->shamt);
+
+    func(tcg_ctx, src1, src1, src2);
+
+    gen_set_gpr(tcg_ctx, a->rd, src1);
+    tcg_temp_free(tcg_ctx, src1);
+    return true;
+}
+
 static bool gen_shift(DisasContext *ctx, arg_r *a,
                         void(*func)(TCGContext *, TCGv, TCGv, TCGv))
 {

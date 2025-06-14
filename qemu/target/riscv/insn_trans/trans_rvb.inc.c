@@ -125,3 +125,8 @@ static bool trans_bset(DisasContext *ctx, arg_bset *a)
 {
     return gen_shift(ctx, a, gen_bset);
 }
+
+static bool trans_bseti(DisasContext *ctx, arg_bseti *a)
+{
+    return gen_shift_imm_tl(ctx, a, gen_bset);
+}

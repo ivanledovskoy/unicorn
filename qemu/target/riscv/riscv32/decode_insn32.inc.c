@@ -384,6 +384,8 @@ typedef arg_r2 arg_sext_h;
 static bool trans_sext_h(DisasContext *ctx, arg_sext_h *a);
 typedef arg_r arg_bset;
 static bool trans_bset(DisasContext *ctx, arg_bset *a);
+typedef arg_shift arg_bseti;
+static bool trans_bseti(DisasContext *ctx, arg_bseti *a);
 
 static void decode_insn32_extract_atom_ld(DisasContext *ctx, arg_atomic *a, uint32_t insn)
 {
@@ -626,6 +628,12 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 decode_insn32_extract_sh(ctx, &u.f_shift, insn);
                 if (trans_slli(ctx, &u.f_shift)) return true;
                 return false;
+            case 0x5:
+                /* 00101... ........ .001.... .0010011 */
+                /* qemu-10.0.2/target/riscv/insn32.decode:840 */
+                decode_insn32_extract_sh(ctx, &u.f_shift, insn);
+                if (trans_bseti(ctx, &u.f_shift)) return true;
+                return false;
             case 0xc:
                 /* 01100... ........ .001.... .0010011 */
                 decode_insn32_extract_r2(ctx, &u.f_r2, insn);
@@ -658,6 +666,7 @@ static bool decode_insn32(DisasContext *ctx, uint32_t insn)
                 }
                 return false;
             }
+            return false;
         case 0x2:
             /* ........ ........ .010.... .0010011 */
             /* /home/me/projects/unicorn2/qemu-5.0.0-build/target/riscv/insn32.decode:105 */
