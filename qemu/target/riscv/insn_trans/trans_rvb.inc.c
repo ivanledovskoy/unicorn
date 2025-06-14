@@ -182,3 +182,23 @@ static bool trans_bexti(DisasContext *ctx, arg_bexti *a)
 {
     return gen_shift_imm_tl(ctx, a, gen_bext);
 }
+
+static void gen_rorw(TCGContext *tcg_ctx, TCGv ret, TCGv arg1, TCGv arg2)
+{
+    TCGv_i32 t1 = tcg_temp_new_i32(tcg_ctx);
+    TCGv_i32 t2 = tcg_temp_new_i32(tcg_ctx);
+
+    /* truncate to 32-bits */
+    tcg_gen_trunc_tl_i32(tcg_ctx, t1, arg1);
+    tcg_gen_trunc_tl_i32(tcg_ctx, t2, arg2);
+
+    tcg_gen_rotr_i32(tcg_ctx, t1, t1, t2);
+
+    /* sign-extend 64-bits */
+    tcg_gen_ext_i32_tl(tcg_ctx, ret, t1);
+}
+
+static bool trans_ror(DisasContext *ctx, arg_ror *a)
+{
+    return gen_shift_per_ol(ctx, a, tcg_gen_rotr_tl, gen_rorw);
+}

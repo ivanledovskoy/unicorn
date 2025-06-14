@@ -778,6 +778,21 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
     return true;
 }
 
+static bool gen_shift_per_ol(DisasContext *ctx, arg_r *a,
+                             void (*f_tl)(TCGContext *, TCGv, TCGv, TCGv),
+                             void (*f_32)(TCGContext *, TCGv, TCGv, TCGv))
+{
+    int olen = get_olen(ctx);
+    if (olen != TARGET_LONG_BITS) {
+        if (olen == 32) {
+            f_tl = f_32;
+        } else {
+            g_assert_not_reached();
+        }
+    }
+    return gen_shift(ctx, a, f_tl);
+}
+
 static bool gen_unary(TCGContext *tcg_ctx, arg_r2 *a,
                       void (*func)(TCGContext *, TCGv, TCGv))
 {
