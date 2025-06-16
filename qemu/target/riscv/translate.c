@@ -83,6 +83,19 @@ static const int tcg_memop_lookup[8] = {
 #define CASE_OP_32_64(X) case X
 #endif
 
+/* The operation length, as opposed to the xlen. */
+#ifdef TARGET_RISCV32
+#define get_ol(ctx)    MXL_RV32
+#else
+#define get_ol(ctx)    MXL_RV64
+//#define get_ol(ctx)    ((ctx)->ol)
+#endif
+
+static inline int get_olen(DisasContext *ctx)
+{
+    return 16 << get_ol(ctx);
+}
+
 static inline bool has_ext(DisasContext *ctx, uint32_t ext)
 {
     return ctx->misa & ext;
@@ -592,6 +605,28 @@ static int ex_rvc_shifti(DisasContext *ctx, int imm)
 #include "riscv64/decode_insn32.inc.c"
 #endif
 
+static bool gen_logic(DisasContext *ctx, arg_r *a,
+                      void (*func)(TCGContext *, TCGv, TCGv, TCGv))
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    
+    TCGv src1, src2;
+    src1 = tcg_temp_new(tcg_ctx);
+    src2 = tcg_temp_new(tcg_ctx);
+
+    gen_get_gpr(tcg_ctx, src1, a->rs1);
+    gen_get_gpr(tcg_ctx, src2, a->rs2);
+
+    (*func)(tcg_ctx, src1, src1, src2);
+
+    gen_set_gpr(tcg_ctx, a->rd, src1);
+
+    tcg_temp_free(tcg_ctx, src1);
+    tcg_temp_free(tcg_ctx, src2);
+
+    return true;
+}
+
 static bool gen_arith_imm_fn(DisasContext *ctx, arg_i *a,
                              void (*func)(TCGContext *, TCGv, TCGv, target_long))
 {
@@ -701,10 +736,26 @@ static bool gen_arith(TCGContext *tcg_ctx, arg_r *a,
     gen_get_gpr(tcg_ctx, source2, a->rs2);
 
     (*func)(tcg_ctx, source1, source1, source2);
-
     gen_set_gpr(tcg_ctx, a->rd, source1);
     tcg_temp_free(tcg_ctx, source1);
     tcg_temp_free(tcg_ctx, source2);
+    return true;
+}
+
+static bool gen_shift_imm_tl(DisasContext *ctx, arg_shift *a,
+                        void(*func)(TCGContext *, TCGv, TCGv, TCGv))
+{
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    TCGv src1, src2;
+    src1 = tcg_temp_new(tcg_ctx);
+
+    gen_get_gpr(tcg_ctx, src1, a->rs1);
+    src2 = tcg_const_tl(tcg_ctx, a->shamt);
+
+    func(tcg_ctx, src1, src1, src2);
+
+    gen_set_gpr(tcg_ctx, a->rd, src1);
+    tcg_temp_free(tcg_ctx, src1);
     return true;
 }
 
@@ -727,6 +778,52 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
     return true;
 }
 
+static bool gen_shift_per_ol(DisasContext *ctx, arg_r *a,
+                             void (*f_tl)(TCGContext *, TCGv, TCGv, TCGv),
+                             void (*f_32)(TCGContext *, TCGv, TCGv, TCGv))
+{
+    int olen = get_olen(ctx);
+    if (olen != TARGET_LONG_BITS) {
+        if (olen == 32) {
+            f_tl = f_32;
+        } else {
+            g_assert_not_reached();
+        }
+    }
+    return gen_shift(ctx, a, f_tl);
+}
+
+static bool gen_unary(TCGContext *tcg_ctx, arg_r2 *a,
+                      void (*func)(TCGContext *, TCGv, TCGv))
+{
+    TCGv src1;
+
+    src1 = tcg_temp_new(tcg_ctx);
+    gen_get_gpr(tcg_ctx, src1, a->rs1);
+
+    (*func)(tcg_ctx, src1, src1);
+
+    gen_set_gpr(tcg_ctx, a->rd, src1);
+    tcg_temp_free(tcg_ctx, src1);
+    return true;
+}
+
+static bool gen_unary_per_ol(DisasContext *ctx, arg_r2 *a,
+                             void (*f_tl)(TCGContext *, TCGv, TCGv),
+                             void (*f_32)(TCGContext *, TCGv, TCGv))
+{
+    int olen = get_olen(ctx);
+    if (olen != TARGET_LONG_BITS) {
+        if (olen == 32) {
+            f_tl = f_32;
+        } else {
+            g_assert_not_reached();
+        }
+    }
+    TCGContext *tcg_ctx = ctx->uc->tcg_ctx;
+    return gen_unary(tcg_ctx, a, f_tl);
+}
+
 /* Include insn module translation function */
 #include "insn_trans/trans_rvi.inc.c"
 #include "insn_trans/trans_rvm.inc.c"
@@ -734,6 +831,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
 #include "insn_trans/trans_rvf.inc.c"
 #include "insn_trans/trans_rvd.inc.c"
 #include "insn_trans/trans_privileged.inc.c"
+#include "insn_trans/trans_rvb.inc.c"
 
 /* Include the auto-generated decoder for 16 bit insn */
 #ifdef TARGET_RISCV32
